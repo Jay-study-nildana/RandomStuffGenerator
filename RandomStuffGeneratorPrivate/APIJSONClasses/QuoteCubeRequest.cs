@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace RandomStuffGeneratorPrivate.APIJSONClasses
 {
-    public class QuoteCube
+    //class that is used when sending a request for a specific quote
+    public class QuoteSpecificCubeRequest
     {
-        public string QuoteTitle { get; set; }
-        public string QuoteContent { get; set; }
+        public string QuoteIdentifier { set; get; }
     }
 }

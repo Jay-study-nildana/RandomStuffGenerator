@@ -7,12 +7,32 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Archives\AllUser3.cs" />
+    <Compile Remove="Archives\AllUsers.cs" />
+    <Compile Remove="Archives\AllUsers2.cs" />
+    <Compile Remove="Archives\BlogsTestController.cs" />
+    <Compile Remove="Archives\QuotesController.cs" />
+    <Compile Remove="Archives\RandomQuotesController.cs" />
+    <Compile Remove="Archives\RandomQuotesSecureController.cs" />
+    <Compile Remove="Archives\Root.cs" />
+    <Compile Remove="Archives\UserManagementController.cs" />
+    <Compile Remove="Archives\UserProfile.cs" />
+    <Compile Remove="Archives\WeatherForecastController.cs" />
     <Compile Remove="Controllers\BlogsTestController.cs" />
     <Compile Remove="Controllers\QuotesController.cs" />
+    <Compile Remove="Controllers\RandomQuotesController.cs" />
+    <Compile Remove="Controllers\RandomQuotesSecureController.cs" />
+    <Compile Remove="Controllers\UserManagementController.cs" />
     <Compile Remove="Controllers\WeatherForecastController.cs" />
+    <Compile Remove="POCO\AllUser3.cs" />
+    <Compile Remove="POCO\AllUsers.cs" />
+    <Compile Remove="POCO\AllUsers2.cs" />
+    <Compile Remove="POCO\Root.cs" />
+    <Compile Remove="POCO\UserProfile.cs" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.8">
@@ -21,6 +41,8 @@
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.4" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="RestSharp" Version="106.11.7" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.2" />
   </ItemGroup>
 
@@ -28,6 +50,10 @@
     <None Update="blogging.db">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Archives\" />
   </ItemGroup>
 
 

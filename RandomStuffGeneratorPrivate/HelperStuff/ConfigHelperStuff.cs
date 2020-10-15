@@ -35,7 +35,7 @@ namespace RandomStuffGeneratorPrivate.HelperStuff
             //for example this is for a localhost default for a simple node server or react web app server
             AddCorsOrigin1LocalHost = @"http://localhost:3000";
             //this could be your app hosted on the cloud. the production domain
-            AddCorsOrigin2ProductionSite = @"https://baribasicidentityjsappserverjuly28th2020.azurewebsites.net";
+            AddCorsOrigin2ProductionSite = @"https://randomstuffreactjsappsept24.azurewebsites.net";
             //I just kept this as a joke. in case Microsoft wants to access my API server
             AddCorsOrigin3DevOrTestOrSomethingElseSite = @"http://www.contoso.com";
             UseSwaggerUISwaggerEndpointTitle = @"an api server that randomly generates things.";

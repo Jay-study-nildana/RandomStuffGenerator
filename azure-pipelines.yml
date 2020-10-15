@@ -54,5 +54,5 @@ steps:
   inputs:
     Package: '$(Build.ArtifactStagingDirectory)/WebApp.zip'
     appType: 'webApp'
-    ConnectedServiceName: ''
-    WebAppName: ''    
+    ConnectedServiceName: 'RandomStuffGeneratorConnection'
+    WebAppName: 'RandomStuffGeneratorSep23'    
