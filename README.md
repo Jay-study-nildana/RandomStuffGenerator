@@ -1,10 +1,16 @@
-# API Server
+# Random Stuff API Server
 
-Hello and welcome to my Quotes API Server. 
+Find the latest documentation of the app here - https://github.com/Jay-study-nildana/RandomStuffDocs/tree/main/APIServer
 
-# Documentation
+Find the documentation for this specific version here - https://github.com/Jay-study-nildana/RandomStuffDocs/tree/ZeroPointTwoPointZero/APIServer
 
-for more details, check online documentation here - 
+Find the documentation for the entire project here - https://github.com/Jay-study-nildana/RandomStuffDocs
+
+# Version Changes
+
+Current Version is 0.2.0
+
+available here - https://github.com/Jay-study-nildana/RandomStuffDocs/blob/ZeroPointTwoPointZero/VersionandChanges.md
 
 # important note 
 
