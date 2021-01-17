@@ -1,6 +1,7 @@
 ﻿using RandomStuffGeneratorPrivate.APIJSONClasses;
 using RandomStuffGeneratorPrivate.DatabaseClasses;
 using RandomStuffGeneratorPrivate.Interfaces;
+using RandomStuffGeneratorPrivate.OtherClasses;
 using RandomStuffGeneratorPrivate.POCO;
 using System;
 using System.Collections.Generic;
@@ -9,179 +10,368 @@ using System.Threading.Tasks;
 
 namespace RandomStuffGeneratorPrivate.HelperStuff
 {
+
+    #region old quote helper stuff.
     public class QuoteHelpers
     {
-        public QuoteCube ReturnASingleQuoteInMemory()
+    
+        //This used to have a lot of things
+        //they were all moved to interfaces as class as part of the Version 0.3.0 update
+
+    }
+
+
+    #endregion
+
+    #region revamped helper classes and methods
+
+    //as part of the revision of Version 0.3.0, I strated replacing all classes that were standing on their own
+    //with classes that are dependent on an interface. 
+    //When this transition is completed, I expected the entire project to be SOLID compliant, one of which is interface usage.
+
+    //public QuoteCube ReturnASingleQuoteInMemory()
+    //{
+    //    var tempQuoteCube = new QuoteCube();
+
+    //    tempQuoteCube.QuoteContent = "Exciting Times Lie Ahead Of Us";
+    //    tempQuoteCube.QuoteTitle = "Exciting";
+
+    //    return tempQuoteCube;
+    //}
+
+    public class ReturnSingleQuote : IReturnSingleQuote
+    {
+        //this one returns a single quote.
+        //the type of quote is indicate in the options parameters
+        //public async Task DoOperationAsync()
+        public async Task<QuoteCube> ReturnASingleQuote(OptionsSingleQuote optionsSingleQuote)
         {
-            var tempQuoteCube = new QuoteCube();
+            QuoteCube quoteCube = new QuoteCube();
 
-            tempQuoteCube.QuoteContent = "Exciting Times Lie Ahead Of Us";
-            tempQuoteCube.QuoteTitle = "Exciting";
-
-            return tempQuoteCube;
-        }
-
-        public QuoteCube ReturnASingleQuote()
-        {
-            var tempQuoteCube = new QuoteCube();
-
-            tempQuoteCube.QuoteContent = "Exciting Times Lie Ahead Of Us";
-            tempQuoteCube.QuoteTitle = "Exciting";
-
-            return tempQuoteCube;
-        }
-
-        //I am sure we will further modularize this. 
-        internal async Task<QuoteCube> ReturnASingleQuoteAsync(BloggingContext context)
-        {
-            // Instantiate random number generator using system-supplied value as seed.
-            var rand = new Random();
-            var tempQuoteCube = new QuoteCube();
-
-            //first get all the quotes and the count
-            var tempFullList = context.Quotes.ToList();
-            var totalQuoteCount = tempFullList.Count;
-            var tempFirstID = tempFullList.First().QuoteId;
-            var tempLastID = tempFullList.Last().QuoteId;
-
-           if(totalQuoteCount == 0)
+            if(optionsSingleQuote.enumSourceOfData == Enums.EnumSourceOfData.DataBaseInMemory)
             {
-                tempQuoteCube.QuoteContent = "Exciting Times Lie Ahead Of Us";
-                tempQuoteCube.QuoteTitle = "Database Empty";
+                //get quote from memory.
+                quoteCube = await ReturnQuoteFromMemory(optionsSingleQuote);
             }
-           else
+            else if (optionsSingleQuote.enumSourceOfData == Enums.EnumSourceOfData.DataBaseInContext)
             {
-                var tempRandomQuoteToReturn = rand.Next(tempFirstID,tempLastID);
-                var quote = await context.Quotes.FindAsync(tempRandomQuoteToReturn);
-
-                if (quote == null)
+                if(optionsSingleQuote.bloggingContext == null)
                 {
-                    tempQuoteCube.QuoteContent = "Exciting Times Lie Ahead Of Us";
-                    tempQuoteCube.QuoteTitle = "Quote could not be Obtained";
+                    quoteCube.DetailsAboutOperation = "db context is null";
+                    quoteCube.OperationSuccessful = false;
+
+                    return quoteCube;
+                }
+                //get quote from database context
+                quoteCube = await ReturnQuoteFromDatabase(optionsSingleQuote);
+            }
+            else
+            {
+                quoteCube.DetailsAboutOperation = "optionsSingleQuote contains unknown data source.";
+                quoteCube.OperationSuccessful = false;
+            }
+
+            return quoteCube;
+
+        }
+
+        private async Task<QuoteCube> ReturnQuoteFromDatabase(OptionsSingleQuote optionsSingleQuote)
+        {
+            QuoteCube quoteCube = new QuoteCube();
+            OptionsCollectionOfQuotes optionsCollectionOfQuotes = new OptionsCollectionOfQuotes();
+            IQuoteCubeCollection quoteCubeCollection = new ReturnQuoteCubeCollection();
+
+            //now, look at options, if it is random, pick any one.
+            //TODO - both the if and else have some common statements.
+            //perhaps we can merge and keep only the unique things.
+            if (optionsSingleQuote.RandomQuote == true)
+            {
+                //set up collection options.
+
+                optionsCollectionOfQuotes.enumSourceOfData = optionsSingleQuote.enumSourceOfData;
+                optionsCollectionOfQuotes.bloggingContext = optionsSingleQuote.bloggingContext;
+
+                var TempCubeCollection = await quoteCubeCollection.GetQuoteCubeCollection(optionsCollectionOfQuotes);
+
+                if (TempCubeCollection.OperationSuccessful == false)
+                {
+                    quoteCube.DetailsAboutOperation = "There was a problem getting the source collection";
+                    quoteCube.OperationSuccessful = false;
                 }
                 else
                 {
-                    tempQuoteCube.QuoteContent = quote.QuoteContent;
-                    tempQuoteCube.QuoteTitle = quote.QuoteTitle;
+                    //our collection is good.
+                    try
+                    {
+                        //lets pick a random quote.
+                        // Instantiate random number generator using system-supplied value as seed.
+                        var rand = new Random();
+                        var quoteRandomNumber = rand.Next(TempCubeCollection.numberOfQuotes);
+                        quoteCube = TempCubeCollection.quoteCubes[quoteRandomNumber];
+                    }
+                    catch (Exception e)
+                    {
+                        quoteCube.DetailsAboutOperation = "Exception Error " + e.ToString();
+                        quoteCube.OperationSuccessful = false;
+                    }
+
                 }
             }
-
-            return tempQuoteCube;
-        }
-
-        internal QuoteCubeResponse GetquoteCubeResponse(GetQuoteComponent getQuoteComponent)
-        {
-            var tempQuoteCubeResponse = new QuoteCubeResponse();
-
-            //the time of run
-            tempQuoteCubeResponse.dateTimeOfRun = GetCurrentTime();
-
-            //the actual quote.
-            tempQuoteCubeResponse.quoteCube = GetSpecificQuoteCube(getQuoteComponent);
-
-            return tempQuoteCubeResponse;
-        }
-
-        private QuoteCube GetSpecificQuoteCube(GetQuoteComponent getQuoteComponent)
-        {
-            IGetQuoteDetail getQuoteDetail = new GetQuoteDetailWithDBContext();
-
-            Quote quote = (Quote)getQuoteDetail.GetQuote(getQuoteComponent);
-
-            QuoteCube quoteCube = new QuoteCube
+            //if it is specific, see if it is there in the list.
+            else
             {
-                QuoteContent = quote.QuoteContent,
-                QuoteIdentifierCompadre = quote.QuoteId.ToString(),
-                QuoteTitle = quote.QuoteTitle
-            };
+                if (String.IsNullOrEmpty(optionsSingleQuote.QuoteIdentifierCompadre) == true)
+                {
+                    quoteCube.DetailsAboutOperation = "QuoteIdentifierCompadre is missing or empty";
+                    quoteCube.OperationSuccessful = false;
+                }
+                else
+                {
+                    //set up collection options.
+
+                    optionsCollectionOfQuotes.enumSourceOfData = optionsSingleQuote.enumSourceOfData;
+                    optionsCollectionOfQuotes.bloggingContext = optionsSingleQuote.bloggingContext;
+
+                    var TempCubeCollection = await quoteCubeCollection.GetQuoteCubeCollection(optionsCollectionOfQuotes);
+
+                    if (TempCubeCollection.OperationSuccessful == false)
+                    {
+                        quoteCube.DetailsAboutOperation = "There was a problem getting the source collection";
+                        quoteCube.OperationSuccessful = false;
+                    }
+                    else
+                    {
+                        //our collection is good.
+                        try
+                        {
+                            //lets pick a specific quote
+                            var tempquoteCube = TempCubeCollection.quoteCubes.Select(x => x).Where(x => x.QuoteIdentifierCompadre == optionsSingleQuote.QuoteIdentifierCompadre).First();
+                            if (tempquoteCube == null)
+                            {
+                                quoteCube.DetailsAboutOperation = "No quote with " + optionsSingleQuote.QuoteIdentifierCompadre + "exists in our system";
+                                quoteCube.OperationSuccessful = false;
+                            }
+                            else
+                            {
+                                quoteCube = tempquoteCube;
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            quoteCube.DetailsAboutOperation = "Exception Error " + e.ToString();
+                            quoteCube.OperationSuccessful = false;
+                        }
+
+                    }
+                }
+            }
 
             return quoteCube;
         }
 
-        internal QuoteCubeCollectionResponse GetQuoteCubeCollectionResponse(GetQuoteCollectionComponent quoteCollectionComponent)
+        private async Task<QuoteCube> ReturnQuoteFromMemory(OptionsSingleQuote optionsSingleQuote)
         {
-            var tempQuoteCubeCollectionResponse = new QuoteCubeCollectionResponse();
+            QuoteCube quoteCube = new QuoteCube();
+            OptionsCollectionOfQuotes optionsCollectionOfQuotes = new OptionsCollectionOfQuotes();
+            IQuoteCubeCollection quoteCubeCollection = new ReturnQuoteCubeCollection();
 
-            //the time of run
-            tempQuoteCubeCollectionResponse.dateTimeOfRun = GetCurrentTime();
+            //now, look at options, if it is random, pick any one.
+            //TODO - both the if and else have some common statements.
+            //perhaps we can merge and keep only the unique things.
+            if(optionsSingleQuote.RandomQuote == true)
+            {
+                //set up collection options.
 
-            //the actual quotes to return
-            tempQuoteCubeCollectionResponse.quoteCubes = GetQuoteCubes(quoteCollectionComponent);
+                optionsCollectionOfQuotes.enumSourceOfData = optionsSingleQuote.enumSourceOfData;
 
-            //now the count.
-            tempQuoteCubeCollectionResponse.totalQuotesReturned = tempQuoteCubeCollectionResponse.quoteCubes.Count;
+                var TempCubeCollection = await quoteCubeCollection.GetQuoteCubeCollection(optionsCollectionOfQuotes);
 
+                if(TempCubeCollection.OperationSuccessful == false)
+                {
+                    quoteCube.DetailsAboutOperation = "There was a problem getting the source collection";
+                    quoteCube.OperationSuccessful = false;
+                }
+                else
+                {
+                    //our collection is good.
+                    try
+                    {
+                        //lets pick a random quote.
+                        // Instantiate random number generator using system-supplied value as seed.
+                        var rand = new Random();
+                        var quoteRandomNumber = rand.Next(TempCubeCollection.numberOfQuotes);
+                        quoteCube = TempCubeCollection.quoteCubes[quoteRandomNumber];
+                    }
+                    catch(Exception e)
+                    {
+                        quoteCube.DetailsAboutOperation = "Exception Error " + e.ToString();
+                        quoteCube.OperationSuccessful = false;
+                    }
 
-            return tempQuoteCubeCollectionResponse;
+                }
+            }
+            //if it is specific, see if it is there in the list.
+            else
+            {
+                if(String.IsNullOrEmpty(optionsSingleQuote.QuoteIdentifierCompadre) == true)
+                {
+                    quoteCube.DetailsAboutOperation = "QuoteIdentifierCompadre is missing or empty" ;
+                    quoteCube.OperationSuccessful = false;
+                }
+                else
+                {
+                    //set up collection options.
+
+                    optionsCollectionOfQuotes.enumSourceOfData = optionsSingleQuote.enumSourceOfData;
+
+                    var TempCubeCollection = await quoteCubeCollection.GetQuoteCubeCollection(optionsCollectionOfQuotes);
+
+                    if (TempCubeCollection.OperationSuccessful == false)
+                    {
+                        quoteCube.DetailsAboutOperation = "There was a problem getting the source collection";
+                        quoteCube.OperationSuccessful = false;
+                    }
+                    else
+                    {
+                        //our collection is good.
+                        try
+                        {
+                            //lets pick a specific quote
+                            var tempquoteCube = TempCubeCollection.quoteCubes.Select(x => x).Where(x => x.QuoteIdentifierCompadre == optionsSingleQuote.QuoteIdentifierCompadre).First();
+                            if(tempquoteCube == null)
+                            {
+                                quoteCube.DetailsAboutOperation = "No quote with " + optionsSingleQuote.QuoteIdentifierCompadre + "exists in our system";
+                                quoteCube.OperationSuccessful = false;
+                            }
+                            else
+                            {
+                                quoteCube = tempquoteCube;
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            quoteCube.DetailsAboutOperation = "Exception Error " + e.ToString();
+                            quoteCube.OperationSuccessful = false;
+                        }
+
+                    }
+                }
+            }
+
+            return quoteCube;
+        }
+    }
+
+    public class ReturnQuoteCubeCollection : IQuoteCubeCollection
+    {
+        public async Task<QuoteCubeCollection> GetQuoteCubeCollection(OptionsCollectionOfQuotes optionsCollectionOfQuotes)
+        {
+            QuoteCubeCollection quoteCubeCollection = new QuoteCubeCollection();
+
+            if (optionsCollectionOfQuotes.enumSourceOfData == Enums.EnumSourceOfData.DataBaseInMemory)
+            {
+                quoteCubeCollection = await GetCollectionOfQuotesFromMemory();
+            }
+            else if(optionsCollectionOfQuotes.enumSourceOfData == Enums.EnumSourceOfData.DataBaseInContext)
+            {
+                quoteCubeCollection = await GetCollectionOfQuotesFromContext(optionsCollectionOfQuotes);
+            }
+            else
+            {
+                quoteCubeCollection.DetailsAboutOperation = "optionsSingleQuote contains unknown data source.";
+                quoteCubeCollection.OperationSuccessful = false;
+            }
+
+            return quoteCubeCollection;
         }
 
-        private List<QuoteCube> GetQuoteCubes(GetQuoteCollectionComponent quoteCollectionComponent)
+        private async Task<QuoteCubeCollection> GetCollectionOfQuotesFromContext(OptionsCollectionOfQuotes optionsCollectionOfQuotes)
         {
-            IGetCollectionOfQuotes getCollectionOfQuotes = new GetCollectionOfQuotesWithDBContext();
+            QuoteCubeCollection quoteCubeCollection = new QuoteCubeCollection
+            {
+                quoteCubes = await SimpleCollectionOfQuoteCubesFromContext(optionsCollectionOfQuotes)
+            };
+            quoteCubeCollection.numberOfQuotes = quoteCubeCollection.quoteCubes.Count;
 
-            List<object> list = getCollectionOfQuotes.QuoteCollection(quoteCollectionComponent);
-
-            //convert generic list to preferred format
-            //IEnumerable<Object> listObject1 = dbResponse.Cast<Object>();
-            IEnumerable<QuoteCube> quoteCubes = list.Cast<QuoteCube>();
-
-            return quoteCubes.ToList();
+            return quoteCubeCollection;
         }
 
-        //TODO - is this another candidate to be wrapped in an interface? 
-        private string GetCurrentTime()
+        private async Task<List<QuoteCube>> SimpleCollectionOfQuoteCubesFromContext(OptionsCollectionOfQuotes optionsCollectionOfQuotes)
         {
-            //I like the standard en-US format.
-            //change formats here - https://docs.microsoft.com/en-us/dotnet/api/system.datetime.tostring?view=netcore-3.1#System_DateTime_ToString_System_String_
-            var timestring = DateTime.UtcNow.ToString("F");
-            return timestring;
+            //at this point, I am assuming that the context is already checked for
+            //dude, we cannot just send the entire 1000s of quotes.
+            var limitOfQuotes = 100;
+            var tempListOriginal = optionsCollectionOfQuotes.bloggingContext.QuoteModels.ToList().Take(limitOfQuotes);
+
+            var tempList = new List<QuoteCube>();
+
+            //the database tables use the schema tables
+            //my API uses JSON classes that are separate from the schema classes
+            //this is the conversion happening
+            //TODO - can we move this to a interface + class that does the conversion? 
+            foreach(var x in tempListOriginal)
+            {
+                var tempQuoteCube = new QuoteCube
+                {
+                    QuoteContent = x.QuoteContent,
+                    QuoteIdentifierCompadre = x.QuoteId.ToString(),
+                    QuoteAuthor = x.QuoteAuthor,
+                    QuoteIdentifierString = x.QuoteIdentifierString
+                };
+
+                var generalAPIResponse = new GeneralAPIResponse
+                {
+                    dateTimeOfResponse = DateTime.Now
+                };
+                tempQuoteCube.generalAPIResponse = generalAPIResponse;
+
+                tempList.Add(tempQuoteCube);
+            }
+
+            //here, adding this await because, I am using an async Task based interface.
+            //this being a memory based implementation, it does not actually have to wait for anything.
+            //so, just wrapping this simple result in a task to avoid getting 'lack of async' error.
+            return await Task.FromResult(tempList);
         }
 
-        //public string ReturnTheSecretForAdding()
-        //{
-        //    var tempSecretPhrase = "its69man";
-
-        //    return tempSecretPhrase;
-        //}
-
-        internal List<ReturnedQuote> GetTheQuotesBeastMan(BloggingContext context)
+        private async Task<List<QuoteCube>> SimpleCollectionOfQuoteCubes()
         {
-            IGetCollectionOfQuotes getTheQuotesBeastMan = new GetCollectionOfQuotesWithDBContext();
-            List<object> lists = getTheQuotesBeastMan.QuoteCollection(context);
-            List<ReturnedQuote> returningCollection = (List<ReturnedQuote>)lists.Cast<ReturnedQuote>();
+            var tempList = new List<QuoteCube>();
 
-            return returningCollection;
-        }
+            var tempQuote1 = new QuoteCube
+            {
+                QuoteIdentifierString = "1",
+                QuoteContent = "I'm in a glass case of emotion",
+                QuoteAuthor = "Ron"
+            };
 
-        // a simple random quote collection.
-        public List<Quote> SampleCollectionOfQuotes()
-        {
-            var tempList = new List<Quote>();
+            var tempQuote2 = new QuoteCube
+            {
+                QuoteIdentifierString = "2",
+                QuoteContent = "Everyone just relax, all right? Believe me, if there's one thing Ron Burgundy knows, it's women",
+                QuoteAuthor = "Ron"
+            };
 
-            var tempQuote1 = new Quote();
-            tempQuote1.QuoteId = 1;
-            tempQuote1.QuoteContent = "I'm in a glass case of emotion";
-            tempQuote1.QuoteTitle = "Ron";
+            var tempQuote3 = new QuoteCube
+            {
+                QuoteIdentifierString = "3",
+                QuoteContent = "Good evening, San Diego. I'm Veronica Corningstone. Tits McGee is on vacation",
+                QuoteAuthor = "Veronica"
+            };
 
-            var tempQuote2 = new Quote();
-            tempQuote2.QuoteId = 2;
-            tempQuote2.QuoteContent = "Everyone just relax, all right? Believe me, if there's one thing Ron Burgundy knows, it's women";
-            tempQuote2.QuoteTitle = "Ron";
+            var tempQuote4 = new QuoteCube
+            {
+                QuoteIdentifierString = "4",
+                QuoteContent = "I have many leather-bound books and my apartment smells of rich mahogany",
+                QuoteAuthor = "Ron"
+            };
 
-            var tempQuote3 = new Quote();
-            tempQuote3.QuoteId = 3;
-            tempQuote3.QuoteContent = "Good evening, San Diego. I'm Veronica Corningstone. Tits McGee is on vacation";
-            tempQuote3.QuoteTitle = "Veronica";
-
-            var tempQuote4 = new Quote();
-            tempQuote4.QuoteId = 4;
-            tempQuote4.QuoteContent = "I have many leather-bound books and my apartment smells of rich mahogany";
-            tempQuote4.QuoteTitle = "Ron";
-
-            var tempQuote5 = new Quote();
-            tempQuote5.QuoteId = 5;
-            tempQuote5.QuoteContent = "By the beard of Zeus!";
-            tempQuote5.QuoteTitle = "Ron";
+            var tempQuote5 = new QuoteCube
+            {
+                QuoteIdentifierString = "5",
+                QuoteContent = "By the beard of Zeus!",
+                QuoteAuthor = "Ron"
+            };
 
             tempList.Add(tempQuote1);
             tempList.Add(tempQuote2);
@@ -191,94 +381,23 @@ namespace RandomStuffGeneratorPrivate.HelperStuff
 
             //the 5 items above is important for some testing. so, if you want to modify this list, DONT.
 
-            return tempList;
+            //here, adding this await because, I am using an async Task based interface.
+            //this being a memory based implementation, it does not actually have to wait for anything.
+            //so, just wrapping this simple result in a task to avoid getting 'lack of async' error.
+            return await Task.FromResult(tempList);
         }
 
-    }
-
-    internal class GetQuoteDetailWithDBContext : IGetQuoteDetail
-    {
-        public object GetQuote(object context)
+        private async Task<QuoteCubeCollection> GetCollectionOfQuotesFromMemory()
         {
-            GetQuoteComponent getQuoteComponent = (GetQuoteComponent)context;
-
-            BloggingContext bloggingContext = getQuoteComponent.bloggingContext;
-
-            try
+            QuoteCubeCollection quoteCubeCollection = new QuoteCubeCollection
             {
-                //now, pick the specific quote.
-                var foundQuote = bloggingContext.Quotes.Where(quote => quote.QuoteId == Convert.ToInt32(getQuoteComponent.QuoteIdentifier)).FirstOrDefault();
-                Object returnObject = (Object)foundQuote;
-                return returnObject;
-            }
-            catch(Exception e)
-            {
-                //now, pick the specific quote.
-                var foundQuote = bloggingContext.Quotes.FirstOrDefault();
-                foundQuote.QuoteContent = "Something went wrong. Quote Not Found";
-                foundQuote.QuoteId = 0;
-                foundQuote.QuoteTitle = "Zilch";
-                Object returnObject = (Object)foundQuote;
-                return returnObject;
-            }
+                quoteCubes = await SimpleCollectionOfQuoteCubes()
+            };
+            quoteCubeCollection.numberOfQuotes = quoteCubeCollection.quoteCubes.Count;
+
+            return quoteCubeCollection;
         }
     }
 
-    public class GetCollectionOfQuotesWithDBContext : IGetCollectionOfQuotes
-    {
-        //TODO - i want to stress test this part. what if I have like a million quotes?
-        //build a helper that will generate and add a million quotes to the database
-        //see if this still works as expected.
-        //public async Task<List<ReturnedQuote>> ReturnTheQuotesAll(BloggingContext context)
-        //{
-        //    //get all quotes
-        //    //convert them to my return type
-        //    //return the returned enumerable as a list.
-        //    var dbResponse = from quote in context.Quotes.ToList()
-        //                     //where quote.QuoteId == 1
-        //                     select new ReturnedQuote
-        //                     {
-        //                         QuoteContent = quote.QuoteContent,
-        //                         QuoteId = quote.QuoteId,
-        //                         QuoteTitle = quote.QuoteTitle
-        //                     }
-        //                     ;
-        //    return dbResponse.ToList();
-        //}
-
-        public List<object> QuoteCollection(object context)
-        {
-            GetQuoteCollectionComponent quoteCollectionComponent = (GetQuoteCollectionComponent)context;
-
-            //TODO - add a null check for db context and return a default sample list, already available in this helper.
-
-            BloggingContext bloggingContext = quoteCollectionComponent.bloggingContext;
-            //get all quotes
-            //convert them to my return type
-            //return the returned enumerable as a list.
-            //TODO - this is query syntax. change this to method syntax - look at ZeroPointTwoPointZeroxUnit
-            //TODO - the default limit - return only QuoteCount number of quotes is not implemented.
-            var dbResponse = from quote in bloggingContext.Quotes.ToList()
-                             select new QuoteCube
-                             {
-                                 QuoteContent = quote.QuoteContent,
-                                 QuoteIdentifierCompadre = quote.QuoteId.ToString(),
-                                 QuoteTitle = quote.QuoteTitle
-                             }
-                             ;
-            //convert list to generic objects.
-            IEnumerable<Object> listObject1 = dbResponse.Cast<Object>();
-            List<object> lists = listObject1.ToList();
-            return lists;
-        }
-    }
-
-    public class SecretForAdding : ISecretForAdding
-    {
-        public object ReturnTheSecretForAdding()
-        {
-            var tempSecretPhrase = "its69man";
-            return tempSecretPhrase;
-        }
-    }
+    #endregion
 }

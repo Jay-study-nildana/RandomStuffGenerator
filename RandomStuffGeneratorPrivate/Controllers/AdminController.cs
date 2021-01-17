@@ -18,14 +18,13 @@ namespace RandomStuffGeneratorPrivate.Controllers
         [Route("Hi")]
         public ActionResult<GeneralAPIResponse> ServerDetailsHi()
         {
-            var tempItemViewModel = new GeneralAPIResponse();
+            var generalAPIResponse = new GeneralAPIResponse();
 
             var tempString1 = "Okay, You have Admin Role";
+            generalAPIResponse.ListOfResponses.Add(tempString1);
+            generalAPIResponse.dateTimeOfResponse = DateTime.Now;
 
-            //lets add all these things to the return collection. 
-            tempItemViewModel.ListOfResponses.Add(tempString1);
-
-            return tempItemViewModel;
+            return generalAPIResponse;
         }
     }
 }

@@ -1,19 +1,15 @@
 # Random Stuff API Server
 
-Find the latest documentation of the app here - https://github.com/Jay-study-nildana/RandomStuffDocs/tree/main/APIServer
+Welcome to the API Server of the Random Stuff Generator.
 
-Find the documentation for this specific version here - https://github.com/Jay-study-nildana/RandomStuffDocs/tree/ZeroPointTwoPointZero/APIServer
+Find the documentation of the [api server here](https://jay-study-nildana.github.io/RandomStuffDocs/APIServer/)
 
-Find the documentation for the entire project here - https://github.com/Jay-study-nildana/RandomStuffDocs
+Find the documentation for the [entire project here](https://jay-study-nildana.github.io/RandomStuffDocs/)
 
-# Version Changes
-
-Current Version is 0.2.0
-
-available here - https://github.com/Jay-study-nildana/RandomStuffDocs/blob/ZeroPointTwoPointZero/VersionandChanges.md
+Thank you.
 
 # important note 
 
 This code is provided as is without any warranties. It's primarily meant for my own personal use, and to make it easy for me share code with my students. Feel free to use this code as it pleases you.
 
-I can be reached through my website - http://thechalakas.com/
+I can be reached through my website - [Jay's Developer Profile](https://jay-study-nildana.github.io/developerprofile)

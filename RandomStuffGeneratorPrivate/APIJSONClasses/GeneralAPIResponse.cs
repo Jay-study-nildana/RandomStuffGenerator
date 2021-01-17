@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RandomStuffGeneratorPrivate.BaseClasses;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,29 +10,17 @@ using System.Threading.Tasks;
 
 namespace RandomStuffGeneratorPrivate.APIJSONClasses
 {
-    public class GeneralAPIResponse
+    public class GeneralAPIResponse : ResponseBase
     {
-        public List<string> ListOfResponses { set; get; }
-
         //I want at least one message to be in the response.
         public GeneralAPIResponse()
         {
             ListOfResponses = new List<string>();
             var firstmessage = "API Response Below";
             ListOfResponses.Add(firstmessage);
-        }
-    }
-
-    public class GeneralResponseModel
-    {
-        public List<string> ListOfResponses { set; get; }
-
-        //I want at least one message to be in the response.
-        public GeneralResponseModel()
-        {
-            ListOfResponses = new List<string>();
-            var firstmessage = "Project WT Responses below";
-            ListOfResponses.Add(firstmessage);
+            //be default we assume things went well and only update when there is an error. 
+            OperationSuccessful = true;
+            DetailsAboutOperation = "Clean as a whistle";
         }
     }
 }

@@ -7,7 +7,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RandomStuffGeneratorPrivate.APIJSONClasses;
 using RandomStuffGeneratorPrivate.DatabaseClasses;
+using RandomStuffGeneratorPrivate.Enums;
 using RandomStuffGeneratorPrivate.HelperStuff;
+using RandomStuffGeneratorPrivate.Interfaces;
+using RandomStuffGeneratorPrivate.OtherClasses;
 using RandomStuffGeneratorPrivate.POCO;
 
 namespace RandomStuffGeneratorPrivate.Controllers
@@ -19,9 +22,9 @@ namespace RandomStuffGeneratorPrivate.Controllers
     {
         //here is the context
 
-        private readonly BloggingContext _context;
+        private readonly QuoteCMSContext _context;
 
-        public UserController(BloggingContext context)
+        public UserController(QuoteCMSContext context)
         {
             _context = context;
         }
@@ -30,33 +33,42 @@ namespace RandomStuffGeneratorPrivate.Controllers
         [Route("Hi")]
         public ActionResult<GeneralAPIResponse> ServerDetailsHi()
         {
-            var tempItemViewModel = new GeneralAPIResponse();
+            var generalAPIResponse = new GeneralAPIResponse();
 
             var tempString1 = "Okay, You have User Role";
+            generalAPIResponse.ListOfResponses.Add(tempString1);
+            generalAPIResponse.dateTimeOfResponse = DateTime.Now;
 
-            //lets add all these things to the return collection. 
-            tempItemViewModel.ListOfResponses.Add(tempString1);
-
-            return tempItemViewModel;
+            return generalAPIResponse;
         }
 
-        [HttpPost]
-        [Route("GetASpecificQuote")]
-        public ActionResult<QuoteCubeResponse> GetASpecificQuote(QuoteSpecificCubeRequest quoteCubeRequest)
-        {
-            //helpers and stuff 
-            var tempQuoteHelpers = new QuoteHelpers();
+        //I dont need this. we already have GetQuoteAlongWithItsLifeStory
 
-            //a quote return customization component.
-            //as of now, we are not really providing any specific features but this is a placeholder for future.
-            GetQuoteComponent getQuoteComponent = new GetQuoteComponent();
-            getQuoteComponent.QuoteIdentifier = quoteCubeRequest.QuoteIdentifier;
-            getQuoteComponent.bloggingContext = _context;
+        //[HttpPost]
+        //[Route("GetASpecificQuote")]
+        //public async Task<ActionResult<QuoteCube>> GetASpecificQuote(QuoteSpecificCubeRequest quoteCubeRequest)
+        //{
+        //    var tempQuoteCube = new QuoteCube();
+        //    IReturnSingleQuote returnSingleQuote = new ReturnSingleQuote();
+        //    OptionsSingleQuote optionsSingleQuote = new OptionsSingleQuote();
 
+        //    //setting options
+        //    optionsSingleQuote.enumSourceOfData = EnumSourceOfData.DataBaseInContext;
+        //    //quote is random
+        //    optionsSingleQuote.RandomQuote = false;
+        //    //set the context.
+        //    optionsSingleQuote.bloggingContext = _context;
+        //    //set the quote identifier.
+        //    optionsSingleQuote.QuoteIdentifierCompadre = quoteCubeRequest.QuoteIdentifier;
 
-            QuoteCubeResponse quoteCubeResponse = tempQuoteHelpers.GetquoteCubeResponse(getQuoteComponent);
+        //    tempQuoteCube = await returnSingleQuote.ReturnASingleQuote(optionsSingleQuote);
 
-            return quoteCubeResponse;
-        }
+        //    //add the general response
+        //    var generalAPIResponse = new GeneralAPIResponse();
+        //    generalAPIResponse.dateTimeOfResponse = DateTime.Now;
+        //    tempQuoteCube.generalAPIResponse = generalAPIResponse;
+
+        //    return tempQuoteCube;
+        //}
     }
 }

@@ -5,10 +5,15 @@ using System.Threading.Tasks;
 
 namespace RandomStuffGeneratorPrivate.BaseClasses
 {
+    //This is a response item that is part of each and every response. 
+
     public abstract class ResponseBase
     {
-        public string dateTimeOfRun { set; get; }
+        public List<string> ListOfResponses { set; get; }
+        public DateTime dateTimeOfResponse { set; get; }
+        public bool OperationSuccessful { get; set; }
 
-        public string TimeZone { set; get; }
+        //I should be able to include notes, especially if operation failed.
+        public string DetailsAboutOperation { get; set; }
     }
 }

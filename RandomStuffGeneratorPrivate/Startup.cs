@@ -99,33 +99,18 @@ namespace RandomStuffGeneratorPrivate
             {
                 options.AddDefaultPolicy(builder =>
                 {
-                    builder.WithOrigins(tempConfigHelperStuff.AddCorsOrigin1LocalHost,
-                                        tempConfigHelperStuff.AddCorsOrigin2ProductionSite,
-                                        tempConfigHelperStuff.AddCorsOrigin3DevOrTestOrSomethingElseSite);
+                    builder.WithOrigins(Configuration["CorsOriginLocalHost"],
+                                        Configuration["CorsOriginStaging"],
+                                        Configuration["CorsOriginProduction"]);
                     builder.AllowAnyMethod();
                     builder.AllowAnyHeader();
                     builder.AllowCredentials();
                 });
             });
 
-            //this is another way, reading the origins from appsettings.
-            //https://stackoverflow.com/questions/64166545/provide-an-array-of-origins-to-builder-withorigins-in-addcors
-            //string[] s = Configuration["Origins"].Split(",");
-            ////just a random string put here for kicsk
-            //var tempHelloFromAppSettings = Configuration["HelloWorld"];
-            //services.AddCors(options =>
-            //{
-            //    options.AddDefaultPolicy(builder => {
-            //        builder.WithOrigins(s);
-            //        builder.AllowAnyMethod();
-            //        builder.AllowAnyHeader();
-            //        builder.AllowCredentials();
-            //    });
-            //});
-
             //database context
-            services.AddDbContext<BloggingContext>(options =>
-                        options.UseSqlite("Data Source=blogging.db"));
+            services.AddDbContext<QuoteCMSContext>(options =>
+                        options.UseSqlite(Configuration["SqliteConnectionString"]));
 
             // 1. Add Authentication Services
             services.AddAuthentication(options =>
@@ -134,10 +119,8 @@ namespace RandomStuffGeneratorPrivate
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(options =>
             {
-                //TODO1 - migrate this to appsettings.json
-                //https://auth0.com/docs/quickstart/backend/aspnet-core-webapi#post-passwordless-start
-                options.Authority = "https://randomquoteexperimental.us.auth0.com/";
-                options.Audience = "https://thechalakas.com";
+                options.Authority = Configuration["Authority"];
+                options.Audience = Configuration["Audience"];
             });
 
             // Register the scope authorization handler
@@ -145,8 +128,6 @@ namespace RandomStuffGeneratorPrivate
 
             services.AddAuthorization(options =>
             {
-                //TODO1 - similar to above , migrate this also to appsettings.json
-                //these are some test roles. 
                 options.AddPolicy("capquotes", policy => policy.Requirements.Add(new HasScopeRequirement("read:capquotes", "https://randomquoteexperimental.us.auth0.com/")));
                 options.AddPolicy("penquotes", policy => policy.Requirements.Add(new HasScopeRequirement("read:penquotes", "https://randomquoteexperimental.us.auth0.com/")));
                 //Check Roles.md for detailed documentation on how roles are defined in this project
@@ -188,7 +169,7 @@ namespace RandomStuffGeneratorPrivate
             // specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "0.3.0");
                 c.RoutePrefix = string.Empty;
             });
 

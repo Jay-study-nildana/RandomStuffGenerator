@@ -19,7 +19,7 @@ namespace RandomStuffGeneratorPrivate.Controllers
         [Route("Hi")]
         public ActionResult<GeneralAPIResponse> ServerDetailsHi()
         {
-            var tempItemViewModel = new GeneralAPIResponse();
+            var generalAPIResponse = new GeneralAPIResponse();
 
             var tempString1 = "This is a Self Contained API Server";
             var tempString2 = "It has its own local SQLite database";
@@ -29,14 +29,15 @@ namespace RandomStuffGeneratorPrivate.Controllers
             var tempString6 = "Contact the developer at jay@thechalakas.com";
 
             //lets add all these things to the return collection. 
-            tempItemViewModel.ListOfResponses.Add(tempString1);
-            tempItemViewModel.ListOfResponses.Add(tempString2);
-            tempItemViewModel.ListOfResponses.Add(tempString3);
-            tempItemViewModel.ListOfResponses.Add(tempString4);
-            tempItemViewModel.ListOfResponses.Add(tempString5);
-            tempItemViewModel.ListOfResponses.Add(tempString6);
+            generalAPIResponse.ListOfResponses.Add(tempString1);
+            generalAPIResponse.ListOfResponses.Add(tempString2);
+            generalAPIResponse.ListOfResponses.Add(tempString3);
+            generalAPIResponse.ListOfResponses.Add(tempString4);
+            generalAPIResponse.ListOfResponses.Add(tempString5);
+            generalAPIResponse.ListOfResponses.Add(tempString6);
+            generalAPIResponse.dateTimeOfResponse = DateTime.Now;
 
-            return tempItemViewModel;
+            return generalAPIResponse;
         }
 
         //[HttpGet]

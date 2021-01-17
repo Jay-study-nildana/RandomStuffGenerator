@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 namespace RandomStuffGeneratorPrivate.BaseClasses
 {
     //at a bare minimum, every quote must have a title and a content.
-    public abstract class QuoteBase
+    public abstract class QuoteBase : QuoteCoreBase
     {
-        public string QuoteTitle { get; set; }
-        public string QuoteContent { get; set; }
+        //this is the actual quote identifier used by the CMS.
+        public string QuoteIdentifierString { get; set; }
     }
 }

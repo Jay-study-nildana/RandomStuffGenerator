@@ -101,8 +101,6 @@ namespace RandomStuffGeneratorPrivate.Controllers
         {
             var tempQuoteHelpers = new QuoteHelpers();
             var tempReturningCollection = new List<ReturnedQuote>();
-
-            //TODO - we should ge around to avoiding having to send the context every time.
             tempReturningCollection = await tempQuoteHelpers.GetTheQuotesBeastMan(_context);
 
             return tempReturningCollection;
