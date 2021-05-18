@@ -128,26 +128,26 @@ namespace RandomStuffGeneratorPrivate
 
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("capquotes", policy => policy.Requirements.Add(new HasScopeRequirement("read:capquotes", "https://randomquoteexperimental.us.auth0.com/")));
-                options.AddPolicy("penquotes", policy => policy.Requirements.Add(new HasScopeRequirement("read:penquotes", "https://randomquoteexperimental.us.auth0.com/")));
+                options.AddPolicy("capquotes", policy => policy.Requirements.Add(new HasScopeRequirement("read:capquotes", "https://.us.auth0.com/")));
+                options.AddPolicy("penquotes", policy => policy.Requirements.Add(new HasScopeRequirement("read:penquotes", "https://.us.auth0.com/")));
                 //Check Roles.md for detailed documentation on how roles are defined in this project
                 //policy related to User Role
-                options.AddPolicy("User", policy => 
+                options.AddPolicy("User", policy =>
                 {
-                    policy.Requirements.Add(new HasScopeRequirement("read:profiledetails", "https://randomquoteexperimental.us.auth0.com/"));
+                    policy.Requirements.Add(new HasScopeRequirement("read:profiledetails", "https://.us.auth0.com/"));
                 });
                 //policy related to Moderator Role
                 options.AddPolicy("Moderator", policy =>
                 {
-                    policy.Requirements.Add(new HasScopeRequirement("read:profiledetails", "https://randomquoteexperimental.us.auth0.com/"));
-                    policy.Requirements.Add(new HasScopeRequirement("read:seeallquotes", "https://randomquoteexperimental.us.auth0.com/"));
+                    policy.Requirements.Add(new HasScopeRequirement("read:profiledetails", "https://.us.auth0.com/"));
+                    policy.Requirements.Add(new HasScopeRequirement("read:seeallquotes", "https://.us.auth0.com/"));
                 });
                 //policy related to Admin Role
                 options.AddPolicy("Admin", policy =>
                 {
-                    policy.Requirements.Add(new HasScopeRequirement("read:profiledetails", "https://randomquoteexperimental.us.auth0.com/"));
-                    policy.Requirements.Add(new HasScopeRequirement("read:seeallquotes", "https://randomquoteexperimental.us.auth0.com/"));
-                    policy.Requirements.Add(new HasScopeRequirement("read:sitestats", "https://randomquoteexperimental.us.auth0.com/"));
+                    policy.Requirements.Add(new HasScopeRequirement("read:profiledetails", "https://.us.auth0.com/"));
+                    policy.Requirements.Add(new HasScopeRequirement("read:seeallquotes", "https://.us.auth0.com/"));
+                    policy.Requirements.Add(new HasScopeRequirement("read:sitestats", "https://.us.auth0.com/"));
                 });
             });
 
@@ -169,7 +169,7 @@ namespace RandomStuffGeneratorPrivate
             // specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "0.3.0");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "0.4.0");
                 c.RoutePrefix = string.Empty;
             });
 

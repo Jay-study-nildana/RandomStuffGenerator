@@ -4,9 +4,18 @@ Welcome to the API Server of the Random Stuff Generator.
 
 Find the documentation of the [api server here](https://jay-study-nildana.github.io/RandomStuffDocs/APIServer/)
 
-Find the documentation for the [entire project here](https://jay-study-nildana.github.io/RandomStuffDocs/)
+Find the documentation, student notes and deployments for the [entire project here](https://jay-study-nildana.github.io/RandomStuffDocs/)
 
 Thank you.
+
+# Projects
+
+1. [API Server Project](RandomStuffGeneratorPrivate)
+1. [xUnit Testing Project](XUnitTesting)
+
+# Hire Me
+
+I work as a full time freelance software developer and coding tutor. Hire me at [UpWork](https://www.upwork.com/fl/vijayasimhabr) or [Fiverr](https://www.fiverr.com/jay_codeguy). 
 
 # important note 
 
